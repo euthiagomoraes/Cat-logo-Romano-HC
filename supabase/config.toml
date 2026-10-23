@@ -1,0 +1,5 @@
+# Configuração mínima para o Supabase CLI.
+project_id = "catalogo-rhc"
+
+[functions.admin-usuarios]
+verify_jwt = false

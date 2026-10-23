@@ -1,0 +1,112 @@
+/* Tokens da marca: azul e amarelo do logo "R", neutros puxados para o azul */
+:root {
+  --brand: #0F3E86;
+  --brand-2: #0A2C63;
+  --sun: #F5B623;
+  --sun-ink: #2A1E00;
+  --bg: #EEF2F8;
+  --surface: #FFFFFF;
+  --surface-2: #F5F7FB;
+  --ink: #14213D;
+  --muted: #58648A;
+  --line: #D8DFEB;
+  --tile: #E5ECF7;
+  --tile-ink: #5874A6;
+  --price: #0F3E86;
+  --link: #0F3E86;
+  --ok: #17834A;
+  --ok-bg: #E3F4EA;
+  --danger: #C2362B;
+  --danger-bg: #FBE7E5;
+  --warn-bg: #FFF4D6;
+  --warn-ink: #7A5300;
+  --shadow: 0 1px 2px rgba(14, 40, 92, .06), 0 8px 24px rgba(14, 40, 92, .08);
+  --f-display: "Barlow Condensed", "Arial Narrow", system-ui, sans-serif;
+  --f-body: "Barlow", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --r: 12px;
+  --gutter: max(16px, env(safe-area-inset-left, 0px));
+  --gutter-r: max(16px, env(safe-area-inset-right, 0px));
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --brand: #0E3679;
+    --brand-2: #08204A;
+    --bg: #0A1120;
+    --surface: #121B2D;
+    --surface-2: #18233A;
+    --ink: #E6EBF5;
+    --muted: #9AA6C0;
+    --line: #27344E;
+    --tile: #1A2742;
+    --tile-ink: #86A3D4;
+    --price: #FFFFFF;
+    --link: #F5C451;
+    --ok: #3CC47C;
+    --ok-bg: #12301F;
+    --danger: #F06A5F;
+    --danger-bg: #3A1716;
+    --warn-bg: #3A2C08;
+    --warn-ink: #F5D27A;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .35);
+    color-scheme: dark;
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 15px;
+  line-height: 1.45;
+}
+body.travado { overflow: hidden; }
+img { max-width: 100%; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; background: none; border: 0; padding: 0; }
+button:disabled { cursor: not-allowed; }
+a { color: inherit; }
+h1, h2, h3, h4 { margin: 0; text-wrap: balance; }
+:focus-visible { outline: 3px solid var(--sun); outline-offset: 2px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.ico { width: 1.25em; height: 1.25em; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-left: var(--gutter); padding-right: var(--gutter-r); }
+.sel { user-select: all; font-variant-numeric: tabular-nums; }
+
+/* botões e campos compartilhados */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 9px 14px; border-radius: 8px; border: 1px solid var(--line);
+  background: var(--surface); color: var(--ink); font-weight: 600; font-size: 14px;
+  white-space: nowrap; text-decoration: none; transition: border-color .15s, background .15s;
+}
+.btn:hover:not(:disabled) { border-color: var(--brand); }
+.btn.primary { background: var(--brand); border-color: var(--brand); color: #fff; }
+.btn.sun { background: var(--sun); border-color: var(--sun); color: var(--sun-ink); }
+.btn.sun:hover:not(:disabled) { filter: brightness(.96); border-color: var(--sun); }
+.btn.danger { color: var(--danger); }
+.btn.ghost { background: transparent; border-color: transparent; }
+.btn.lg { padding: 12px 18px; font-size: 15px; }
+.btn:disabled { opacity: .5; }
+.btn.icon { padding: 8px; }
+
+.fld { display: flex; flex-direction: column; gap: 5px; min-width: 0; font-size: 13px; font-weight: 600; color: var(--muted); }
+.fld.full { grid-column: 1 / -1; }
+.input, .fld input, .fld select, .fld textarea {
+  width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px;
+  background: var(--surface-2); color: var(--ink); font-weight: 500; font-size: 15px;
+}
+.fld textarea { resize: vertical; }
+.input:focus, .fld input:focus, .fld select:focus, .fld textarea:focus { outline: 2px solid var(--brand); outline-offset: 0; border-color: transparent; }
+.hint { margin: 0; font-size: 13px; font-weight: 500; color: var(--muted); }
+.hint code { background: var(--surface-2); border: 1px solid var(--line); padding: 1px 5px; border-radius: 4px; font-size: 12px; }
+.erro-txt { margin: 0; color: var(--danger); font-size: 13px; font-weight: 600; }
+.bad { border-color: var(--danger) !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+}
