@@ -1,0 +1,123 @@
+/* =========================================================
+   Mascote RHC — entrada animada (anda, para e acena)
+   Quadros do vídeo desenhados num <canvas> (todos os navegadores).
+   ========================================================= */
+.rhc-mascote {
+  --rhc-azul: var(--brand, #1c3778);
+  --rhc-amarelo: var(--sun, #e9b24c);
+  --rhc-altura: 280px;               /* altura do mascote */
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  z-index: 35;                       /* acima da página, abaixo do toast (40) e do modal/gaveta (50) */
+  display: flex;
+  align-items: flex-end;
+  pointer-events: none;
+  font-family: inherit;
+}
+.rhc-mascote--inline { position: relative; left: auto; bottom: auto; z-index: auto; }
+.rhc-mascote[hidden] { display: none; }
+
+/* palco: proporção dos quadros (512×450); o mascote termina na metade direita */
+.rhc-mascote__palco {
+  position: relative;
+  height: var(--rhc-altura);
+  aspect-ratio: 512 / 450;
+  flex: none;
+}
+.rhc-mascote__midia {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  display: block;
+  object-fit: contain;
+  background: transparent;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+.rhc-mascote__midia[hidden] { display: none; }
+
+/* área clicável só sobre o mascote parado (não bloqueia a página) */
+.rhc-mascote__toque {
+  position: absolute;
+  left: 55%; width: 43%; top: 0; bottom: 0;
+  pointer-events: none;
+  cursor: pointer;
+  border: 0; padding: 0; background: transparent;
+  border-radius: 40% 40% 12px 12px;
+}
+.rhc-mascote.is-pronto .rhc-mascote__toque { pointer-events: auto; }
+.rhc-mascote__toque:focus-visible { outline: 3px solid var(--rhc-amarelo); outline-offset: -3px; }
+
+/* ---------- balão ---------- */
+.rhc-mascote__balao {
+  pointer-events: auto;
+  position: relative;
+  align-self: flex-start;
+  margin: calc(var(--rhc-altura) * .06) 0 0 -4px;
+  max-width: 230px;
+  padding: 12px 34px 12px 16px;
+  background: #fff;
+  color: var(--rhc-azul);
+  border: 2px solid var(--rhc-azul);
+  border-radius: 16px 16px 16px 4px;
+  box-shadow: 0 6px 18px rgba(28, 55, 120, .18);
+  font-size: 15px; line-height: 1.3; font-weight: 600;
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(.4) translateY(20px);
+  transform-origin: 0 100%;
+  transition: opacity .25s ease, transform .45s cubic-bezier(.34, 1.56, .64, 1), visibility 0s .45s;
+}
+.rhc-mascote.is-falando .rhc-mascote__balao {
+  opacity: 1; visibility: visible; transform: none;
+  transition: opacity .25s ease, transform .45s cubic-bezier(.34, 1.56, .64, 1), visibility 0s;
+}
+.rhc-mascote__balao strong { display: block; font-size: 18px; color: var(--rhc-azul); }
+.rhc-mascote__balao span { color: #43507a; font-weight: 500; }
+.rhc-mascote__balao::after {
+  content: ""; position: absolute; left: -11px; bottom: 10px;
+  border: 7px solid transparent; border-right: 10px solid var(--rhc-azul);
+}
+.rhc-mascote__balao a {
+  display: inline-block; margin-top: 8px; padding: 6px 12px;
+  background: var(--rhc-amarelo); color: var(--rhc-azul);
+  border-radius: 999px; font-size: 13px; font-weight: 700; text-decoration: none;
+}
+.rhc-mascote__balao a:hover { filter: brightness(1.05); }
+.rhc-mascote__fechar {
+  position: absolute; top: 6px; right: 6px;
+  width: 24px; height: 24px; border: 0; border-radius: 50%;
+  background: transparent; color: var(--rhc-azul);
+  font-size: 18px; line-height: 1; cursor: pointer;
+}
+.rhc-mascote__fechar:hover { background: rgba(28, 55, 120, .08); }
+
+/* ---------- saída ---------- */
+.rhc-mascote.is-saindo .rhc-mascote__palco {
+  animation: rhc-sai .55s cubic-bezier(.5, 0, .75, .3) forwards;
+}
+.rhc-mascote.is-saindo .rhc-mascote__balao { opacity: 0; transform: scale(.6); }
+@keyframes rhc-sai {
+  0%   { transform: translateY(0); }
+  25%  { transform: translateY(-4%); }
+  100% { transform: translateY(110%); opacity: .6; }
+}
+
+/* ---------- responsivo ---------- */
+@media (max-width: 640px) {
+  .rhc-mascote { --rhc-altura: 190px; }
+  .rhc-mascote__balao { max-width: 165px; font-size: 13px; padding: 10px 28px 10px 12px; }
+  .rhc-mascote__balao strong { font-size: 15px; }
+}
+
+/* ---------- reduzir movimento ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .rhc-mascote.is-saindo .rhc-mascote__palco { animation: none; opacity: 0; }
+  .rhc-mascote__balao { transition: none; }
+}
+
+/* ---------- impressão (orçamento em PDF) ---------- */
+@media print {
+  .rhc-mascote { display: none !important; }
+}

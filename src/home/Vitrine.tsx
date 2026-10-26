@@ -3,6 +3,7 @@ import type { Banner, Catalogo, Categoria, Produto } from '../lib/types';
 import { Icon } from '../lib/icons';
 import { brl, desconto, fmtTelefone, norm, num, waLink } from '../lib/format';
 import { GavetaOrcamento, Qtd, limitar, useOrcamento } from './Orcamento';
+import MascoteRHC from '../mascote/MascoteRHC';
 
 const LOGO_PADRAO = '/logo.jpg';
 type Ordem = 'relevancia' | 'menor' | 'maior' | 'desconto' | 'az';
@@ -270,6 +271,13 @@ export default function Vitrine({ dados, previa }: Props) {
         <GavetaOrcamento
           loja={loja} logo={logo} itens={orc.itens} total={orc.total}
           definir={orc.definir} limpar={orc.limpar} onFechar={() => setGaveta(false)}
+        />
+      )}
+
+      {!previa && (
+        <MascoteRHC
+          mensagem={`Bem-vindo ao catálogo ${loja.nome}! Confira as ofertas da semana.`}
+          onLink={ofertas.length ? () => irPara('ofertas') : undefined}
         />
       )}
 
