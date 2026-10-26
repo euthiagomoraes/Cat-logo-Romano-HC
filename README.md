@@ -4,7 +4,7 @@ Catálogo digital do home center com duas áreas:
 
 | Endereço | Para quem | O que faz |
 |---|---|---|
-| `/home` | Clientes | Vitrine pública com banners, departamentos, ofertas, busca e botão de WhatsApp em cada produto. Mostra sempre a **última versão publicada**. |
+| `/home` | Clientes | Vitrine pública com banners, departamentos, ofertas, busca e **orçamento**: o cliente adiciona vários produtos, ajusta as quantidades e envia a lista pelo WhatsApp ou imprime/salva em PDF. O orçamento fica guardado no navegador do cliente, com os preços da versão publicada. Mostra sempre a **última versão publicada**. |
 | `/adm` | Equipe da loja | Login, edição de produtos, preços, fotos, banners e dados da loja; **Gravar** (salva o rascunho) e **Publicar** (coloca no ar em `/home`); cadastro de outros administradores. |
 
 `/` redireciona para `/home`.

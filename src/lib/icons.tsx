@@ -45,6 +45,9 @@ const IC: Record<string, string> = {
   key: '<circle cx="8" cy="15" r="4"/><path d="m11 12 9-9M17 6l3 3"/>',
   alert: '<path d="M12 3 2 20h20z"/><path d="M12 10v4M12 17v.5"/>',
   check: '<path d="m5 12 5 5 9-10"/>',
+  minus: '<path d="M5 12h14"/>',
+  cart: '<path d="M3 4h2.2l2.3 11h11l2-8H6.3"/><circle cx="9" cy="19.5" r="1.5"/><circle cx="17" cy="19.5" r="1.5"/>',
+  print: '<path d="M7 9V3h10v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M7 14h10v7H7z"/>',
 };
 
 export const GLIFOS_DEPARTAMENTO: [string, string][] = [

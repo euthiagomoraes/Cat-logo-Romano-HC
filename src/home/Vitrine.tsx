@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } fro
 import type { Banner, Catalogo, Categoria, Produto } from '../lib/types';
 import { Icon } from '../lib/icons';
 import { brl, desconto, fmtTelefone, norm, num, waLink } from '../lib/format';
+import { GavetaOrcamento, Qtd, limitar, useOrcamento } from './Orcamento';
 
 const LOGO_PADRAO = '/logo.jpg';
 type Ordem = 'relevancia' | 'menor' | 'maior' | 'desconto' | 'az';
@@ -22,8 +23,22 @@ export default function Vitrine({ dados, previa }: Props) {
   const [busca, setBusca] = useState('');
   const [ordem, setOrdem] = useState<Ordem>('relevancia');
   const [aberto, setAberto] = useState<Produto | null>(null);
+  const [gaveta, setGaveta] = useState(false);
+  const [aviso, setAviso] = useState('');
+  const avisoT = useRef(0);
   const raizRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLElement>(null);
+  const orc = useOrcamento(produtos, !previa);
+
+  const adicionar = useCallback((p: Produto, qtd = 1) => {
+    orc.adicionar(p.id, qtd);
+    setAviso(`${p.nome} adicionado ao orçamento`);
+    window.clearTimeout(avisoT.current);
+    avisoT.current = window.setTimeout(() => setAviso(''), 3500);
+  }, [orc.adicionar]);
+  useEffect(() => () => window.clearTimeout(avisoT.current), []);
+
+  const abrirGaveta = () => { setAberto(null); setAviso(''); setGaveta(true); };
 
   const logo = loja.logo_url || LOGO_PADRAO;
   const wa = useCallback((texto: string) => waLink(loja.whatsapp, texto), [loja.whatsapp]);
@@ -84,8 +99,12 @@ export default function Vitrine({ dados, previa }: Props) {
 
   const catAtual = catPorId.get(cat);
   const card = (p: Produto) => (
-    <CardProduto key={p.id} p={p} categoria={p.categoria_id ? catPorId.get(p.categoria_id) : undefined} onAbrir={setAberto} linkWa={waProduto(p)} />
+    <CardProduto
+      key={p.id} p={p} categoria={p.categoria_id ? catPorId.get(p.categoria_id) : undefined} onAbrir={setAberto}
+      qtd={orc.qtdDe(p.id)} onAdicionar={() => adicionar(p)} onMudar={(n) => orc.definir(p.id, n)}
+    />
   );
+  const nItens = orc.itens.length;
 
   return (
     <div className={`vitrine${previa ? ' previa' : ''}`} ref={raizRef}>
@@ -113,11 +132,16 @@ export default function Vitrine({ dados, previa }: Props) {
             <input id="busca" type="search" placeholder="O que você precisa para a sua obra?" value={busca} onChange={(e) => setBusca(e.target.value)} autoComplete="off" />
             <button type="submit" aria-label="Buscar"><Icon name="search" /></button>
           </form>
-          {loja.whatsapp && (
-            <a className="hdr-wa" href={wa('Olá! Vim pelo catálogo digital.')} target="_blank" rel="noopener noreferrer" aria-label="Fale conosco no WhatsApp">
-              <Icon name="chat" /><span>Fale conosco<b>{fmtTelefone(loja.whatsapp)}</b></span>
-            </a>
-          )}
+          <div className="hdr-acoes">
+            {loja.whatsapp && (
+              <a className="hdr-wa" href={wa('Olá! Vim pelo catálogo digital.')} target="_blank" rel="noopener noreferrer" aria-label="Fale conosco no WhatsApp">
+                <Icon name="chat" /><span>Fale conosco<b>{fmtTelefone(loja.whatsapp)}</b></span>
+              </a>
+            )}
+            <button className="hdr-orc" onClick={abrirGaveta} aria-label={`Ver orçamento: ${nItens} ${nItens === 1 ? 'item' : 'itens'}`}>
+              <Icon name="cart" /><span className="rot">Orçamento</span><span className="cont">{nItens}</span>
+            </button>
+          </div>
         </div>
       </header>
 
@@ -235,9 +259,23 @@ export default function Vitrine({ dados, previa }: Props) {
           categoria={aberto.categoria_id ? catPorId.get(aberto.categoria_id) : undefined}
           linkWa={waProduto(aberto)}
           whatsapp={loja.whatsapp}
+          noOrcamento={orc.qtdDe(aberto.id)}
+          onAdicionar={(qtd) => { adicionar(aberto, qtd); setAberto(null); }}
+          onVerOrcamento={abrirGaveta}
           onFechar={() => setAberto(null)}
         />
       )}
+
+      {gaveta && (
+        <GavetaOrcamento
+          loja={loja} logo={logo} itens={orc.itens} total={orc.total}
+          definir={orc.definir} limpar={orc.limpar} onFechar={() => setGaveta(false)}
+        />
+      )}
+
+      <div className="toast" role="status">
+        {aviso && <div><Icon name="check" /><span>{aviso}</span><button onClick={abrirGaveta}>Ver orçamento</button></div>}
+      </div>
     </div>
   );
 }
@@ -259,7 +297,9 @@ function Preco({ p }: { p: Produto }) {
   );
 }
 
-function CardProduto({ p, categoria, onAbrir, linkWa }: { p: Produto; categoria?: Categoria; onAbrir: (p: Produto) => void; linkWa: string }) {
+function CardProduto({ p, categoria, onAbrir, qtd, onAdicionar, onMudar }: {
+  p: Produto; categoria?: Categoria; onAbrir: (p: Produto) => void; qtd: number; onAdicionar: () => void; onMudar: (n: number) => void;
+}) {
   const d = desconto(p);
   return (
     <article className="card">
@@ -273,7 +313,9 @@ function CardProduto({ p, categoria, onAbrir, linkWa }: { p: Produto; categoria?
         <h3><button onClick={() => onAbrir(p)}>{p.nome}</button></h3>
         <span className="unid">{p.unidade}{p.marca ? ` · ${p.marca}` : ''}</span>
         <Preco p={p} />
-        <a className="btn-wa" href={linkWa} target="_blank" rel="noopener noreferrer"><Icon name="chat" /> Consultar</a>
+        {qtd > 0
+          ? <Qtd valor={qtd} rotulo={p.nome} onMudar={onMudar} />
+          : <button className="btn-wa" onClick={onAdicionar}><Icon name="cart" /> Adicionar</button>}
       </div>
     </article>
   );
@@ -377,11 +419,13 @@ function Carrossel({ banners, linkWa, onClicar }: { banners: Banner[]; linkWa: (
   );
 }
 
-function ModalProduto({ p, categoria, linkWa, whatsapp, onFechar }: {
-  p: Produto; categoria?: Categoria; linkWa: string; whatsapp: string; onFechar: () => void;
+function ModalProduto({ p, categoria, linkWa, whatsapp, noOrcamento, onAdicionar, onVerOrcamento, onFechar }: {
+  p: Produto; categoria?: Categoria; linkWa: string; whatsapp: string;
+  noOrcamento: number; onAdicionar: (qtd: number) => void; onVerOrcamento: () => void; onFechar: () => void;
 }) {
   const fecharRef = useRef<HTMLButtonElement>(null);
   const [copiado, setCopiado] = useState(false);
+  const [qtd, setQtd] = useState(1);
   const d = desconto(p);
 
   useEffect(() => {
@@ -414,9 +458,16 @@ function ModalProduto({ p, categoria, linkWa, whatsapp, onFechar }: {
           <span className="sku">Cód. {p.sku} · {p.unidade}{p.marca ? ` · ${p.marca}` : ''}</span>
           <Preco p={p} />
           {p.descricao && <p>{p.descricao}</p>}
+          <div className="modal-add">
+            <Qtd valor={qtd} min={1} rotulo={p.nome} onMudar={(n) => setQtd(limitar(n))} />
+            <button className="btn-wa lg" onClick={() => onAdicionar(qtd)}><Icon name="cart" /> Adicionar ao orçamento</button>
+          </div>
+          {noOrcamento > 0 && (
+            <p className="wa-num">Você já tem {noOrcamento} no orçamento.<button onClick={onVerOrcamento}>Ver orçamento</button></p>
+          )}
           {whatsapp && (
             <>
-              <a className="btn-wa lg" href={linkWa} target="_blank" rel="noopener noreferrer"><Icon name="chat" /> Pedir pelo WhatsApp</a>
+              <a className="btn-wa" href={linkWa} target="_blank" rel="noopener noreferrer"><Icon name="chat" /> Tirar dúvida pelo WhatsApp</a>
               <p className="wa-num">Ou chame no número <span className="sel">{fmtTelefone(whatsapp)}</span><button onClick={copiar}>{copiado ? 'Copiado' : 'Copiar'}</button></p>
             </>
           )}

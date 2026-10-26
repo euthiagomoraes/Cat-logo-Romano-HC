@@ -32,7 +32,7 @@ export default function AbaLoja({ rascunho, alterar }: Props) {
       <div className="caixa">
         <h2>Contato</h2>
         <div className="grade-campos">
-          <Campo rotulo="WhatsApp (com 55 e DDD)" dica={L.whatsapp && !waOk ? <span className="erro-txt">Use o formato 55 + DDD + número, ex.: 5591999999999</span> : waOk ? `Aparece como ${fmtTelefone(L.whatsapp)}. Usado nos botões “Consultar”.` : 'Usado nos botões “Consultar”.'}>
+          <Campo rotulo="WhatsApp (com 55 e DDD)" dica={L.whatsapp && !waOk ? <span className="erro-txt">Use o formato 55 + DDD + número, ex.: 5591999999999</span> : waOk ? `Aparece como ${fmtTelefone(L.whatsapp)}. Recebe os orçamentos e as dúvidas dos clientes.` : 'Recebe os orçamentos e as dúvidas dos clientes.'}>
             <input inputMode="tel" value={L.whatsapp} placeholder="5591999999999" onChange={(e) => mudar({ whatsapp: e.target.value })} />
           </Campo>
           <Campo rotulo="Telefone fixo"><input value={L.telefone} onChange={(e) => mudar({ telefone: e.target.value })} /></Campo>
