@@ -35,7 +35,7 @@ export default function MascoteRHC({
   mensagem = 'Confira as ofertas da semana.',
   linkTexto = 'Ver ofertas',
   onLink,
-  umaVezPorSessao = true,
+  umaVezPorSessao = false,
   atrasoMs = 800,
 }: Props) {
   // O script só monta elementos ainda não montados, então chamar init() de novo (StrictMode) é seguro.
