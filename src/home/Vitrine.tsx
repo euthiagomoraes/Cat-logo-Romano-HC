@@ -278,6 +278,8 @@ export default function Vitrine({ dados, previa }: Props) {
         <MascoteRHC
           mensagem={`Bem-vindo ao catálogo ${loja.nome}! Confira as ofertas da semana.`}
           onLink={ofertas.length ? () => irPara('ofertas') : undefined}
+          whatsapp={loja.whatsapp}
+          whatsappTexto={`Olá! Vim pelo catálogo ${loja.nome} e gostaria de falar com um vendedor.`}
         />
       )}
 
@@ -333,8 +335,61 @@ function Prateleira({ id, titulo, sub, produtos, render, faixa }: {
   id: string; titulo: string; sub: string; produtos: Produto[]; render: (p: Produto) => JSX.Element; faixa?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const pausado = useRef(false);
+  const toqueT = useRef(0);
+
+  // avança um card por vez; no fim volta ao início (e vice-versa pelas setas)
+  const rolar = useCallback((dir: number) => {
+    const el = ref.current;
+    const card = el?.firstElementChild as HTMLElement | null;
+    if (!el || !card) return;
+    const passo = card.offsetWidth + parseFloat(getComputedStyle(el).columnGap || '0');
+    const fim = el.scrollWidth - el.clientWidth;
+    let alvo = el.scrollLeft + dir * passo;
+    if (dir > 0 && el.scrollLeft >= fim - 4) alvo = 0;
+    else if (dir < 0 && el.scrollLeft <= 4) alvo = fim;
+    el.scrollTo({ left: alvo, behavior: 'smooth' });
+  }, []);
+
+  useEffect(() => {
+    if (produtos.length < 2 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const t = window.setInterval(() => {
+      const el = ref.current;
+      if (!el || pausado.current || document.hidden || el.scrollWidth <= el.clientWidth + 4) return;
+      rolar(1);
+    }, 3500);
+    return () => { window.clearInterval(t); window.clearTimeout(toqueT.current); };
+  }, [produtos.length, rolar]);
+
+  // indicadores como os do banner: uma bolinha por "tela" de cards, acompanhando a rolagem
+  const [pags, setPags] = useState({ total: 0, atual: 0 });
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const medir = () => {
+      const fim = el.scrollWidth - el.clientWidth;
+      const total = fim > 4 ? Math.ceil(el.scrollWidth / el.clientWidth - 0.05) : 0;
+      const atual = total > 1 ? Math.round((el.scrollLeft / fim) * (total - 1)) : 0;
+      setPags((p) => (p.total === total && p.atual === atual ? p : { total, atual }));
+    };
+    medir();
+    el.addEventListener('scroll', medir, { passive: true });
+    const ro = new ResizeObserver(medir);
+    ro.observe(el);
+    return () => { el.removeEventListener('scroll', medir); ro.disconnect(); };
+  }, [produtos.length]);
+  const irPag = (i: number) => {
+    const el = ref.current;
+    if (!el || pags.total < 2) return;
+    el.scrollTo({ left: (i / (pags.total - 1)) * (el.scrollWidth - el.clientWidth), behavior: 'smooth' });
+  };
+
   if (!produtos.length) return null;
-  const rolar = (dir: number) => ref.current?.scrollBy({ left: dir * ref.current.clientWidth * 0.9, behavior: 'smooth' });
+  const pausar = () => { window.clearTimeout(toqueT.current); pausado.current = true; };
+  const retomar = (atraso = 0) => {
+    window.clearTimeout(toqueT.current);
+    toqueT.current = window.setTimeout(() => { pausado.current = false; }, atraso);
+  };
   return (
     <section className={faixa ? 'faixa' : ''} data-secao={id}>
       <div className="wrap sec">
@@ -345,7 +400,25 @@ function Prateleira({ id, titulo, sub, produtos, render, faixa }: {
             <button className="trilho-btn" onClick={() => rolar(1)} aria-label="Rolar para a direita"><Icon name="right" /></button>
           </div>
         </div>
-        <div className="trilho" ref={ref}>{produtos.map(render)}</div>
+        <div
+          className="trilho"
+          ref={ref}
+          onMouseEnter={pausar}
+          onMouseLeave={() => retomar()}
+          onFocus={pausar}
+          onBlur={() => retomar()}
+          onTouchStart={pausar}
+          onTouchEnd={() => retomar(6000)}
+        >
+          {produtos.map(render)}
+        </div>
+        {pags.total > 1 && (
+          <div className="pontos trilho-pontos">
+            {Array.from({ length: pags.total }, (_, i) => (
+              <button key={i} className={i === pags.atual ? 'on' : ''} onClick={() => irPag(i)} aria-label={`Ir para a parte ${i + 1} de ${titulo}`} />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

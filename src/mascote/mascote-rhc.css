@@ -69,7 +69,7 @@
   transform-origin: 0 100%;
   transition: opacity .25s ease, transform .45s cubic-bezier(.34, 1.56, .64, 1), visibility 0s .45s;
 }
-.rhc-mascote.is-falando .rhc-mascote__balao {
+.rhc-mascote.is-falando .rhc-mascote__balao:not(.rhc-mascote__balao--whats) {
   opacity: 1; visibility: visible; transform: none;
   transition: opacity .25s ease, transform .45s cubic-bezier(.34, 1.56, .64, 1), visibility 0s;
 }
@@ -104,16 +104,72 @@
   100% { transform: translateY(110%); opacity: .6; }
 }
 
+/* ---------- balão do WhatsApp (aparece na saída, no mesmo lugar do 1º balão) ---------- */
+.rhc-mascote__balao--whats {
+  position: absolute;
+  left: calc(var(--rhc-altura) * 512 / 450 - 4px);
+  top: 0;
+  margin-left: 0;
+  max-width: 240px;
+}
+.rhc-mascote__balao--whats span { color: var(--rhc-azul); font-weight: 600; }
+.rhc-mascote.is-saindo-ofertas.is-whats .rhc-mascote__balao--whats {
+  opacity: 1; visibility: visible; transform: none;
+  transition: opacity .25s ease, transform .45s cubic-bezier(.34, 1.56, .64, 1), visibility 0s;
+}
+.rhc-mascote__balao a.rhc-mascote__whats { background: #25d366; color: #fff; }
+.rhc-mascote__balao a.rhc-mascote__whats::before {
+  content: ""; display: inline-block; width: 14px; height: 14px; margin: -2px 6px 0 0; vertical-align: middle;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.5-3.9-4.7-4.1-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.3.5-.4.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.1.1.6-.1 1.2z'/%3E%3C/svg%3E") center / contain no-repeat;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.5-3.9-4.7-4.1-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.3.5-.4.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.1.1.6-.1 1.2z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+/* ---------- "Ver ofertas": confirma e sai pela esquerda ---------- */
+.rhc-mascote.is-saindo-ofertas .rhc-mascote__balao:not(.rhc-mascote__balao--whats) { opacity: 0; visibility: hidden; transform: scale(.6); }
+.rhc-mascote.is-saindo-ofertas .rhc-mascote__toque { pointer-events: none; }
+/* saída provisória (enquanto não houver o vídeo da saída) */
+.rhc-mascote.is-confirmando .rhc-mascote__midia {
+  transform-origin: 77% 100%;
+  animation: rhc-confirma .82s ease-in-out;
+}
+@keyframes rhc-confirma {            /* dois "sim" com o corpo, olhando para cima */
+  0%   { transform: none; }
+  18%  { transform: translateY(-2.5%) rotate(-2.5deg); }
+  36%  { transform: translateY(1.2%) scaleY(.975); }
+  54%  { transform: translateY(-2.5%) rotate(-2.5deg); }
+  72%  { transform: translateY(1.2%) scaleY(.975); }
+  100% { transform: none; }
+}
+.rhc-mascote.is-indo .rhc-mascote__palco {
+  animation: rhc-vai-esquerda 1.15s cubic-bezier(.45, 0, .7, .4) forwards;
+}
+.rhc-mascote.is-indo .rhc-mascote__midia {
+  transform-origin: 77% 100%;
+  animation: rhc-passinhos .29s ease-in-out infinite;
+}
+@keyframes rhc-vai-esquerda {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-100%); }
+}
+@keyframes rhc-passinhos {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  50%      { transform: translateY(-3%) rotate(-3deg); }
+}
+
 /* ---------- responsivo ---------- */
 @media (max-width: 640px) {
   .rhc-mascote { --rhc-altura: 190px; }
   .rhc-mascote__balao { max-width: 165px; font-size: 13px; padding: 10px 28px 10px 12px; }
+  .rhc-mascote__balao--whats { max-width: 175px; }
   .rhc-mascote__balao strong { font-size: 15px; }
 }
 
 /* ---------- reduzir movimento ---------- */
 @media (prefers-reduced-motion: reduce) {
   .rhc-mascote.is-saindo .rhc-mascote__palco { animation: none; opacity: 0; }
+  .rhc-mascote.is-confirmando .rhc-mascote__midia,
+  .rhc-mascote.is-indo .rhc-mascote__midia { animation: none; }
   .rhc-mascote__balao { transition: none; }
 }
 
