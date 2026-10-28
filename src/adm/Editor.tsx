@@ -157,44 +157,11 @@ export default function Editor({ admin, onSair, onAdminAtualizado }: Props) {
 
   return (
     <div className="adm">
-      <header className="adm-top">
-        <div className="adm-top-in">
-          <a className="adm-marca" href="/home" target="_blank" rel="noopener noreferrer" title="Abrir o site publicado">
-            <img src={rascunho.loja.logo_url || '/logo.jpg'} alt="" />
-            <span><b>{rascunho.loja.nome || 'Catálogo'}</b><small>Editor do catálogo</small></span>
-          </a>
-          <span className={`status ${status.cls}`}><i />{status.txt}</span>
-          <div className="adm-acoes">
-            <button className="btn" onClick={() => gravar()} disabled={!sujo || gravando || publicando} title="Ctrl+S">
-              <Icon name="save" />{gravando ? 'Gravando…' : 'Gravar'}
-            </button>
-            <button className="btn sun" onClick={() => setPainelPublicar((v) => !v)} disabled={publicando || (!sujo && !pendente)}>
-              <Icon name="rocket" />Publicar
-            </button>
-            <a className="btn ghost adm-ver" href="/home" target="_blank" rel="noopener noreferrer"><Icon name="external" /><span>Ver site</span></a>
-          </div>
-        </div>
-        {painelPublicar && (
-          <div className="publicar-painel">
-            <div className="publicar-in">
-              <div>
-                <b>Publicar no site</b>
-                <p className="hint">{sujo ? 'As alterações não gravadas serão gravadas antes. ' : ''}Os clientes passam a ver o conteúdo atual do rascunho em /home.</p>
-              </div>
-              <label className="fld">
-                <span>O que mudou? (opcional, aparece no histórico)</span>
-                <input value={observacao} maxLength={200} placeholder="Ex.: Preços de cimento e banner da Semana da Obra" onChange={(e) => setObservacao(e.target.value)} />
-              </label>
-              <div className="row-act">
-                <button className="btn sun" onClick={confirmarPublicacao} disabled={publicando}><Icon name="rocket" />{publicando ? 'Publicando…' : 'Confirmar publicação'}</button>
-                <button className="btn" onClick={() => setPainelPublicar(false)} disabled={publicando}>Cancelar</button>
-              </div>
-            </div>
-          </div>
-        )}
-      </header>
-
-      <div className="adm-corpo">
+      <aside className="adm-lateral">
+        <a className="adm-marca" href="/home" target="_blank" rel="noopener noreferrer" title="Abrir o site publicado">
+          <img src={rascunho.loja.logo_url || '/logo.jpg'} alt="" />
+          <span><b>{rascunho.loja.nome || 'Catálogo'}</b><small>Editor do catálogo</small></span>
+        </a>
         <nav className="adm-nav" aria-label="Seções do editor">
           {(['conteudo', 'site', 'conta'] as const).map((g) => (
             <div className="adm-nav-grupo" key={g}>
@@ -206,51 +173,86 @@ export default function Editor({ admin, onSair, onAdminAtualizado }: Props) {
               ))}
             </div>
           ))}
-          <div className="adm-nav-grupo adm-nav-user">
-            <span className="hint">{admin.nome || admin.email}<br />{ehGestor ? 'Administrador' : 'Editor'}</span>
-            <button onClick={onSair}><Icon name="logout" />Sair</button>
-          </div>
         </nav>
+        <div className="adm-nav-user">
+          <span><b>{admin.nome || admin.email}</b><small>{ehGestor ? 'Administrador' : 'Editor'}</small></span>
+          <button className="btn icon ghost" onClick={onSair} title="Sair" aria-label="Sair"><Icon name="logout" /></button>
+        </div>
+      </aside>
 
-        <main className={`adm-painel${aba === 'previa' ? ' largo' : ''}`}>
-          {conflito && (
-            <Aviso tipo="erro">
-              <b>Outro administrador gravou alterações enquanto você editava.</b> Para não apagar o trabalho dele, suas alterações não foram gravadas.
-              Recarregue o rascunho para ver a versão atual e refaça suas mudanças.
-              <div className="row-act" style={{ marginTop: 8 }}><button className="btn" onClick={carregar}>Recarregar rascunho</button></div>
-            </Aviso>
+      <div className="adm-principal">
+        <header className="adm-top">
+          <div className="adm-top-in">
+            <span className={`status ${status.cls}`}><i />{status.txt}</span>
+            <div className="adm-acoes">
+              <button className="btn" onClick={() => gravar()} disabled={!sujo || gravando || publicando} title="Ctrl+S">
+                <Icon name="save" />{gravando ? 'Gravando…' : 'Gravar'}
+              </button>
+              <button className="btn sun" onClick={() => setPainelPublicar((v) => !v)} disabled={publicando || (!sujo && !pendente)}>
+                <Icon name="rocket" />Publicar
+              </button>
+              <a className="btn ghost adm-ver" href="/home" target="_blank" rel="noopener noreferrer"><Icon name="external" /><span>Ver site</span></a>
+            </div>
+          </div>
+          {painelPublicar && (
+            <div className="publicar-painel">
+              <div className="publicar-in">
+                <div>
+                  <b>Publicar no site</b>
+                  <p className="hint">{sujo ? 'As alterações não gravadas serão gravadas antes. ' : ''}Os clientes passam a ver o conteúdo atual do rascunho em /home.</p>
+                </div>
+                <label className="fld">
+                  <span>O que mudou? (opcional, aparece no histórico)</span>
+                  <input value={observacao} maxLength={200} placeholder="Ex.: Preços de cimento e banner da Semana da Obra" onChange={(e) => setObservacao(e.target.value)} />
+                </label>
+                <div className="row-act">
+                  <button className="btn sun" onClick={confirmarPublicacao} disabled={publicando}><Icon name="rocket" />{publicando ? 'Publicando…' : 'Confirmar publicação'}</button>
+                  <button className="btn" onClick={() => setPainelPublicar(false)} disabled={publicando}>Cancelar</button>
+                </div>
+              </div>
+            </div>
           )}
-          {msg && (
-            <Aviso tipo={msg.tipo} onFechar={() => setMsg(null)}>
-              {msg.texto}{msg.link && <> <a href="/home" target="_blank" rel="noopener noreferrer">Abrir o site</a></>}
-            </Aviso>
-          )}
-          {!sujo && pendente && rascunho.publicado_em === null && rascunho.alterado_em && (
-            <Aviso tipo="info">O site está mostrando uma versão anterior. Publique para colocar o rascunho atual no ar.</Aviso>
-          )}
+        </header>
 
-          {aba === 'produtos' && <AbaProdutos rascunho={rascunho} alterar={alterar} />}
-          {aba === 'banners' && <AbaBanners rascunho={rascunho} alterar={alterar} />}
-          {aba === 'departamentos' && <AbaDepartamentos rascunho={rascunho} alterar={alterar} />}
-          {aba === 'loja' && <AbaLoja rascunho={rascunho} alterar={alterar} />}
-          {aba === 'precos' && <AbaPrecos rascunho={rascunho} alterar={alterar} />}
-          {aba === 'previa' && <div className="previa-moldura"><Vitrine dados={rascunho} previa /></div>}
-          {aba === 'publicacoes' && (
-            <AbaPublicacoes
-              publicadoEm={rascunho.publicado_em}
-              onRepublicado={() => {
-                setRascunho((ant) => (ant ? { ...ant, publicado_em: null } : ant));
-                setMsg({ tipo: 'ok', texto: 'O site voltou para a versão escolhida. O rascunho não foi alterado.', link: true });
-              }}
-            />
-          )}
-          {aba === 'administradores' && <AbaAdministradores eu={admin} />}
-          {aba === 'conta' && <AbaConta eu={admin} onAtualizado={onAdminAtualizado} />}
+          <main className="adm-painel">
+            {conflito && (
+              <Aviso tipo="erro">
+                <b>Outro administrador gravou alterações enquanto você editava.</b> Para não apagar o trabalho dele, suas alterações não foram gravadas.
+                Recarregue o rascunho para ver a versão atual e refaça suas mudanças.
+                <div className="row-act" style={{ marginTop: 8 }}><button className="btn" onClick={carregar}>Recarregar rascunho</button></div>
+              </Aviso>
+            )}
+            {msg && (
+              <Aviso tipo={msg.tipo} onFechar={() => setMsg(null)}>
+                {msg.texto}{msg.link && <> <a href="/home" target="_blank" rel="noopener noreferrer">Abrir o site</a></>}
+              </Aviso>
+            )}
+            {!sujo && pendente && rascunho.publicado_em === null && rascunho.alterado_em && (
+              <Aviso tipo="info">O site está mostrando uma versão anterior. Publique para colocar o rascunho atual no ar.</Aviso>
+            )}
 
-          <p className="adm-rodape hint">
-            Última gravação: {dataHora(rascunho.alterado_em)} · Última publicação: {dataHora(rascunho.publicado_em)}
-          </p>
-        </main>
+            {aba === 'produtos' && <AbaProdutos rascunho={rascunho} alterar={alterar} />}
+            {aba === 'banners' && <AbaBanners rascunho={rascunho} alterar={alterar} />}
+            {aba === 'departamentos' && <AbaDepartamentos rascunho={rascunho} alterar={alterar} />}
+            {aba === 'loja' && <AbaLoja rascunho={rascunho} alterar={alterar} />}
+            {aba === 'precos' && <AbaPrecos rascunho={rascunho} alterar={alterar} />}
+            {aba === 'previa' && <div className="previa-moldura"><Vitrine dados={rascunho} previa /></div>}
+            {aba === 'publicacoes' && (
+              <AbaPublicacoes
+                publicadoEm={rascunho.publicado_em}
+                onRepublicado={() => {
+                  setRascunho((ant) => (ant ? { ...ant, publicado_em: null } : ant));
+                  setMsg({ tipo: 'ok', texto: 'O site voltou para a versão escolhida. O rascunho não foi alterado.', link: true });
+                }}
+              />
+            )}
+            {aba === 'administradores' && <AbaAdministradores eu={admin} />}
+            {aba === 'conta' && <AbaConta eu={admin} onAtualizado={onAdminAtualizado} />}
+
+            <p className="adm-rodape hint">
+              Última gravação: {dataHora(rascunho.alterado_em)} · Última publicação: {dataHora(rascunho.publicado_em)}
+            </p>
+          </main>
       </div>
     </div>
   );
