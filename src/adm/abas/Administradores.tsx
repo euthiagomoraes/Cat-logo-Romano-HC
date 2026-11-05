@@ -8,7 +8,9 @@ import { Aviso, BotaoConfirmar, Campo, copiarTexto } from '../ui';
 const PAPEIS: Record<Papel, string> = {
   administrador: 'Administrador — edita, publica e gerencia a equipe',
   editor: 'Editor — edita e publica',
+  logistica: 'Logística — só o painel de pedidos e entregas (/logistica)',
 };
+const PAPEL_CURTO: Record<Papel, string> = { administrador: 'Administrador', editor: 'Editor', logistica: 'Logística' };
 
 export default function AbaAdministradores({ eu }: { eu: Administrador }) {
   const gestor = eu.papel === 'administrador';
@@ -111,6 +113,7 @@ function NovoAdmin({ onCriado, onErro }: { onCriado: (email: string, senha: stri
         <Campo rotulo="Tipo de acesso">
           <select value={papel} onChange={(e) => setPapel(e.target.value as Papel)}>
             <option value="editor">{PAPEIS.editor}</option>
+            <option value="logistica">{PAPEIS.logistica}</option>
             <option value="administrador">{PAPEIS.administrador}</option>
           </select>
         </Campo>
@@ -138,6 +141,7 @@ function LinhaAdmin({ a, eu, gestor, executar }: {
           <select className="input compacto" value={a.papel} aria-label={`Tipo de acesso de ${a.nome}`}
             onChange={(e) => void executar(() => admins.atualizar(a.user_id, { papel: e.target.value as Papel }), `Acesso de ${a.nome || a.email} atualizado.`)}>
             <option value="editor">Editor</option>
+            <option value="logistica">Logística</option>
             <option value="administrador">Administrador</option>
           </select>
           <button className="btn" onClick={() => void executar(() => admins.atualizar(a.user_id, { ativo: !a.ativo }), a.ativo ? `${a.nome || a.email} não consegue mais entrar.` : `${a.nome || a.email} pode entrar de novo.`)}>
@@ -158,7 +162,7 @@ function LinhaAdmin({ a, eu, gestor, executar }: {
           </BotaoConfirmar>
         </div>
       ) : (
-        <span className="etiqueta">{a.papel === 'administrador' ? 'Administrador' : 'Editor'}</span>
+        <span className="etiqueta">{PAPEL_CURTO[a.papel] ?? a.papel}</span>
       )}
     </div>
   );

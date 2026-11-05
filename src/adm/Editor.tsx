@@ -13,16 +13,18 @@ import AbaPrecos from './abas/Precos';
 import AbaPublicacoes from './abas/Publicacoes';
 import AbaAdministradores from './abas/Administradores';
 import AbaConta from './abas/Conta';
+import AbaCartazes from './abas/Cartazes';
 
 export type Alterar = (fn: (d: Rascunho) => void) => void;
 
-type Aba = 'produtos' | 'banners' | 'departamentos' | 'loja' | 'precos' | 'previa' | 'publicacoes' | 'administradores' | 'conta';
-const ABAS: { id: Aba; rotulo: string; icone: string; grupo: 'conteudo' | 'site' | 'conta' }[] = [
+type Aba = 'produtos' | 'cartazes' | 'banners' | 'departamentos' | 'loja' | 'precos' | 'previa' | 'publicacoes' | 'administradores' | 'conta';
+const ABAS: { id: Aba; rotulo: string; icone: string; grupo: 'conteudo' | 'loja' | 'site' | 'conta' }[] = [
   { id: 'produtos', rotulo: 'Produtos', icone: 'box', grupo: 'conteudo' },
   { id: 'banners', rotulo: 'Banners', icone: 'image', grupo: 'conteudo' },
   { id: 'departamentos', rotulo: 'Departamentos', icone: 'grid', grupo: 'conteudo' },
   { id: 'loja', rotulo: 'Dados da loja', icone: 'store', grupo: 'conteudo' },
   { id: 'precos', rotulo: 'Preços em lote', icone: 'tag', grupo: 'conteudo' },
+  { id: 'cartazes', rotulo: 'Cartazes', icone: 'print', grupo: 'loja' },
   { id: 'previa', rotulo: 'Pré-visualizar', icone: 'eye', grupo: 'site' },
   { id: 'publicacoes', rotulo: 'Publicações', icone: 'history', grupo: 'site' },
   { id: 'administradores', rotulo: 'Administradores', icone: 'users', grupo: 'conta' },
@@ -163,9 +165,9 @@ export default function Editor({ admin, onSair, onAdminAtualizado }: Props) {
           <span><b>{rascunho.loja.nome || 'Catálogo'}</b><small>Editor do catálogo</small></span>
         </a>
         <nav className="adm-nav" aria-label="Seções do editor">
-          {(['conteudo', 'site', 'conta'] as const).map((g) => (
+          {(['conteudo', 'loja', 'site', 'conta'] as const).map((g) => (
             <div className="adm-nav-grupo" key={g}>
-              <span className="adm-nav-titulo">{g === 'conteudo' ? 'Conteúdo' : g === 'site' ? 'Site' : 'Equipe e conta'}</span>
+              <span className="adm-nav-titulo">{g === 'conteudo' ? 'Conteúdo' : g === 'loja' ? 'Loja física' : g === 'site' ? 'Site' : 'Equipe e conta'}</span>
               {ABAS.filter((a) => a.grupo === g).map((a) => (
                 <button key={a.id} className={aba === a.id ? 'on' : ''} aria-current={aba === a.id ? 'page' : undefined} onClick={() => { setAba(a.id); window.scrollTo({ top: 0 }); }}>
                   <Icon name={a.icone} />{a.rotulo}
@@ -236,6 +238,7 @@ export default function Editor({ admin, onSair, onAdminAtualizado }: Props) {
             {aba === 'departamentos' && <AbaDepartamentos rascunho={rascunho} alterar={alterar} />}
             {aba === 'loja' && <AbaLoja rascunho={rascunho} alterar={alterar} />}
             {aba === 'precos' && <AbaPrecos rascunho={rascunho} alterar={alterar} />}
+            {aba === 'cartazes' && <AbaCartazes rascunho={rascunho} />}
             {aba === 'previa' && <div className="previa-moldura"><Vitrine dados={rascunho} previa /></div>}
             {aba === 'publicacoes' && (
               <AbaPublicacoes

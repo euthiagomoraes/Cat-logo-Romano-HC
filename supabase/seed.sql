@@ -1,5 +1,5 @@
 -- =====================================================================
--- Catálogo RHC — dados de exemplo (opcional)
+-- Catálogo ROMANO — dados de exemplo (opcional)
 -- Rode depois da migração principal. Cria um rascunho de demonstração e
 -- a primeira publicação, para /home já abrir com conteúdo.
 -- Produtos, preços e contatos são EXEMPLOS: troque tudo em /adm.
@@ -7,7 +7,7 @@
 begin;
 
 update public.loja set
-  nome = 'RHC Home Center',
+  nome = 'ROMANO Home Center',
   slogan = 'Tudo para a sua obra, do alicerce ao acabamento',
   whatsapp = '5591999990000',
   telefone = '(91) 3000-0000',

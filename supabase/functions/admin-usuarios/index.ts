@@ -20,7 +20,7 @@ const sb = createClient(
   { auth: { persistSession: false, autoRefreshToken: false } },
 );
 
-type Papel = "administrador" | "editor";
+type Papel = "administrador" | "editor" | "logistica";
 interface AdminRow {
   user_id: string;
   nome: string;
@@ -40,7 +40,7 @@ const resposta = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { ...cors, "Content-Type": "application/json" } });
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const PAPEIS: Papel[] = ["administrador", "editor"];
+const PAPEIS: Papel[] = ["administrador", "editor", "logistica"];
 
 function texto(v: unknown, max = 120) {
   return String(v ?? "").trim().slice(0, max);
@@ -57,7 +57,7 @@ function validarSenha(v: unknown) {
   return s;
 }
 function validarPapel(v: unknown): Papel {
-  if (!PAPEIS.includes(v as Papel)) throw new Falha("Escolha o tipo de acesso: administrador ou editor.");
+  if (!PAPEIS.includes(v as Papel)) throw new Falha("Escolha o tipo de acesso: administrador, editor ou logística.");
   return v as Papel;
 }
 

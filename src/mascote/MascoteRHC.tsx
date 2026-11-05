@@ -1,4 +1,4 @@
-// Mascote RHC: entra andando pela esquerda, para e acena; em "Ver ofertas" faz 👍, mostra o balão
+// Mascote ROMANO: entra andando pela esquerda, para e acena; em "Ver ofertas" faz 👍, mostra o balão
 // do WhatsApp e sai correndo (quadros desenhados num <canvas>).
 // O script original (mascote-rhc.js) é empacotado pelo Vite e as folhas WebP saem com hash no build.
 import { useEffect, useRef } from 'react';

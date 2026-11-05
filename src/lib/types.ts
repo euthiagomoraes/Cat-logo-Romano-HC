@@ -73,7 +73,7 @@ export interface Rascunho extends Catalogo {
   publicado_em: string | null;
 }
 
-export type Papel = 'administrador' | 'editor';
+export type Papel = 'administrador' | 'editor' | 'logistica';
 
 export interface Administrador {
   user_id: string;

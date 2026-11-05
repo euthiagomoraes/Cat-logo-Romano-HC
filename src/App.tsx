@@ -1,10 +1,17 @@
-import { Link, Navigate, Route, Routes } from 'react-router-dom';
+import { Link, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import HomePage from './home/HomePage';
 import AdmPage from './adm/AdmPage';
+import LogisticaPage, { LogisticaDemoPage } from './logistica/LogisticaPage';
+import RastreioPage from './logistica/RastreioPage';
 import { supabaseConfigurado } from './lib/supabase';
+import './styles/logistica.css';
 
 export default function App() {
-  if (!supabaseConfigurado) {
+  const { pathname } = useLocation();
+  // As demonstrações da logística funcionam mesmo sem o Supabase configurado
+  const demo = pathname === '/logistica/demo' || pathname.startsWith('/rastreio/demo-');
+
+  if (!supabaseConfigurado && !demo) {
     return (
       <div className="estado">
         <div>
@@ -24,6 +31,9 @@ export default function App() {
       <Route path="/" element={<Navigate to="/home" replace />} />
       <Route path="/home" element={<HomePage />} />
       <Route path="/adm" element={<AdmPage />} />
+      <Route path="/logistica" element={<LogisticaPage />} />
+      <Route path="/logistica/demo" element={<LogisticaDemoPage />} />
+      <Route path="/rastreio/:codigo" element={<RastreioPage />} />
       <Route
         path="*"
         element={

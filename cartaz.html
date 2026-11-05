@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Cartazes · ROMANO</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&family=Bebas+Neue&family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;500;600;700&family=Oswald:wght@400;500;600;700&family=Roboto+Condensed:wght@400;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+</head>
+<body>
+<style id="pageStyle"></style>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand">
+      <img class="brand-mark" src="/logo.jpg" alt="">
+      <div>
+        <h1>Cartazes ROMANO</h1>
+        <p>Placas de oferta para a loja</p>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="app wrap">
+  <section class="controls" aria-label="Controles">
+    <nav class="tabs" role="tablist">
+      <button role="tab" data-tab="dados" aria-selected="true">Oferta</button>
+      <button role="tab" data-tab="modelo" aria-selected="false">Modelo</button>
+      <button role="tab" data-tab="tamanho" aria-selected="false">Tamanho</button>
+      <button role="tab" data-tab="lote" aria-selected="false">Lote</button>
+      <button role="tab" data-tab="loja" aria-selected="false">Loja</button>
+    </nav>
+
+    <!-- OFERTA -->
+    <div class="panel" id="tab-dados" role="tabpanel">
+      <div class="group" id="catGroup" hidden>
+        <p class="group-title">Produto do catálogo</p>
+        <input type="text" id="catBusca" placeholder="Buscar por nome, código ou marca" autocomplete="off" aria-label="Buscar produto do catálogo">
+        <div class="cat-list" id="catLista"></div>
+        <p class="hint">Escolha um produto para preencher descrição, unidade e preços. Depois ajuste o que quiser.</p>
+      </div>
+      <div class="group">
+        <label class="f">Descrição do produto
+          <textarea id="f-descricao" rows="2"></textarea>
+        </label>
+        <label class="f">Unidade / complemento
+          <input type="text" id="f-unidade" placeholder="Ex.: Saco 50 kg, m², barra 12 m">
+        </label>
+        <div class="row">
+          <label class="f">Valor antigo (De)
+            <div class="money-wrap"><span>R$</span><input type="text" class="money" id="f-de" inputmode="decimal" placeholder="0,00"></div>
+          </label>
+          <label class="f">Valor atual (Por)
+            <div class="money-wrap"><span>R$</span><input type="text" class="money" id="f-por" inputmode="decimal" placeholder="0,00"></div>
+          </label>
+        </div>
+        <div class="chips" id="calcChips"></div>
+      </div>
+      <div class="group">
+        <label class="f">Validade / rodapé
+          <input type="text" id="f-validade">
+        </label>
+        <label class="f">Texto extra <span class="hint">(use {extra} em qualquer camada de texto)</span>
+          <input type="text" id="f-extra" placeholder="Ex.: Pagamento no Pix">
+        </label>
+      </div>
+      <div class="group">
+        <p class="group-title">Modelo</p>
+        <div class="tpl-grid" id="tplGrid"></div>
+      </div>
+    </div>
+
+    <!-- MODELO -->
+    <div class="panel" id="tab-modelo" role="tabpanel" hidden>
+      <div class="group">
+        <p class="group-title">Modelo</p>
+        <select id="tplSel" aria-label="Modelo selecionado"></select>
+        <label class="f">Nome do modelo
+          <input type="text" id="tplName">
+        </label>
+        <div class="btn-row">
+          <button class="btn sm" id="tplDup">Duplicar</button>
+          <button class="btn sm" id="tplExport">Exportar .json</button>
+          <button class="btn sm" id="tplImportBtn">Importar .json</button>
+          <button class="btn sm danger" id="tplDel">Excluir</button>
+          <input type="file" id="tplImport" accept="application/json,.json" hidden>
+        </div>
+        <p class="hint" id="tplHint"></p>
+      </div>
+      <div class="group">
+        <p class="group-title">Fundo</p>
+        <div class="row r3">
+          <label class="f">Cor<input type="color" id="bg1"></label>
+          <label class="f">Cor 2<input type="color" id="bg2"></label>
+          <label class="f">&nbsp;<span class="check"><input type="checkbox" id="bgGrad"> Degradê</span></label>
+        </div>
+        <div class="btn-row">
+          <button class="btn sm" id="bgImgBtn">Imagem de fundo…</button>
+          <button class="btn sm" id="bgImgDel">Remover imagem</button>
+          <input type="file" id="bgImg" accept="image/*" hidden>
+        </div>
+      </div>
+      <div class="group">
+        <p class="group-title"><span class="grow">Camadas</span></p>
+        <div class="btn-row">
+          <button class="btn sm" data-add="text">+ Texto</button>
+          <button class="btn sm" data-add="price">+ Preço</button>
+          <button class="btn sm" data-add="shape">+ Forma</button>
+          <button class="btn sm" data-add="mascote">+ Mascote</button>
+          <button class="btn sm" data-add="foto">+ Foto do produto</button>
+          <button class="btn sm" data-add="logo">+ Logo da loja</button>
+          <button class="btn sm" data-add="image">+ Imagem</button>
+        </div>
+        <div class="layers" id="layerList"></div>
+        <p class="hint">Clique na placa para escolher uma camada. Arraste para mover e use o quadrado azul para redimensionar. As setas do teclado movem 0,5% (com Shift, 2%).</p>
+        <div class="props" id="props"></div>
+      </div>
+    </div>
+
+    <!-- TAMANHO -->
+    <div class="panel" id="tab-tamanho" role="tabpanel" hidden>
+      <div class="group">
+        <p class="group-title">Tamanho da placa</p>
+        <select id="sizePreset" aria-label="Tamanho"></select>
+        <div class="row r3">
+          <label class="f">Largura (mm)<input type="number" id="sizeW" min="20" max="3000" step="1"></label>
+          <label class="f">Altura (mm)<input type="number" id="sizeH" min="20" max="3000" step="1"></label>
+          <label class="f">&nbsp;<button class="btn" id="sizeSwap" type="button">Girar ⟲</button></label>
+        </div>
+      </div>
+      <div class="group">
+        <p class="group-title">Impressão e PDF</p>
+        <label class="f">Folha de impressão
+          <select id="outSheet">
+            <option value="placa">Mesmo tamanho da placa</option>
+            <option value="A4">A4 (210 × 297)</option>
+            <option value="A3">A3 (297 × 420)</option>
+            <option value="Carta">Carta (216 × 279)</option>
+            <option value="Oficio">Ofício (216 × 330)</option>
+          </select>
+        </label>
+        <div class="row r3">
+          <label class="f">Margem (mm)<input type="number" id="outMargin" min="0" max="30" step="1"></label>
+          <label class="f">Cópias<input type="number" id="outCopies" min="1" max="200" step="1"></label>
+          <label class="f">Sobrepor (mm)<input type="number" id="outOverlap" min="0" max="40" step="1"></label>
+        </div>
+        <label class="check"><input type="checkbox" id="outCut"> Marcas de corte</label>
+        <label class="f">Resolução
+          <select id="outDpi">
+            <option value="150">150 dpi (rápido)</option>
+            <option value="200">200 dpi (recomendado)</option>
+            <option value="300">300 dpi (gráfica)</option>
+          </select>
+        </label>
+        <div class="chips" id="sheetInfo"></div>
+        <p class="hint">Placas menores que a folha são encaixadas várias por folha. Placas maiores são divididas em partes com sobreposição para colar. Imprima sempre em 100% / tamanho real.</p>
+      </div>
+    </div>
+
+    <!-- LOTE -->
+    <div class="panel" id="tab-lote" role="tabpanel" hidden>
+      <div class="group">
+        <p class="group-title"><span class="passo">1</span>Baixe a planilha modelo</p>
+        <div class="btn-row">
+          <button class="btn sm" id="planilhaModelo">Planilha modelo (.xlsx)</button>
+          <button class="btn sm" id="planilhaCatalogo" hidden>Com os produtos em oferta (.xlsx)</button>
+        </div>
+        <p class="hint">Colunas: Código, Descrição, Unidade, Valor antigo (De), Valor atual (Por), Validade e Cópias. Só Descrição e Valor atual são obrigatórios.</p>
+      </div>
+      <div class="group">
+        <p class="group-title"><span class="passo">2</span>Preencha no Excel e importe</p>
+        <div class="btn-row">
+          <button class="btn primary" id="planilhaImportar">Importar planilha…</button>
+          <input type="file" id="planilhaArquivo" accept=".xlsx,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv" hidden>
+          <button class="btn sm" id="loteLimpar" hidden>Limpar lista</button>
+        </div>
+        <p class="hint">Aceita .xlsx (Excel) ou .csv. Também dá para arrastar o arquivo para esta área.</p>
+        <div class="lote-resumo" id="loteResumo" hidden></div>
+        <div class="lote-list" id="loteList"></div>
+        <p class="hint" id="loteDica" hidden>Clique em um item para ver a placa. Todas usam o modelo e o tamanho escolhidos.</p>
+      </div>
+      <div class="group">
+        <p class="group-title"><span class="passo">3</span>Gere todos os cartazes</p>
+        <div class="btn-row">
+          <button class="btn primary" id="lotePdf">Baixar PDF do lote</button>
+          <button class="btn" id="loteZip">Baixar imagens (.zip)</button>
+          <button class="btn" id="lotePrint">Imprimir lote</button>
+        </div>
+        <p class="hint">Modelo, tamanho e folha de impressão são os escolhidos nas outras abas. A coluna Cópias repete a placa na impressão.</p>
+      </div>
+      <div class="group" id="loteCatGroup" hidden>
+        <p class="group-title">Ou monte direto do catálogo</p>
+        <div class="btn-row">
+          <button class="btn sm" id="loteOfertas">Produtos em oferta</button>
+          <button class="btn sm" id="loteDestaques">Produtos em destaque</button>
+          <button class="btn sm" id="loteTodos">Todos os produtos</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOJA -->
+    <div class="panel" id="tab-loja" role="tabpanel" hidden>
+      <div class="group">
+        <label class="f">Nome da loja <span class="hint">(campo {loja})</span>
+          <input type="text" id="lojaNome">
+        </label>
+        <label class="f">Contato / endereço <span class="hint">(campo {contato})</span>
+          <input type="text" id="lojaContato" placeholder="Ex.: (91) 99999-0000 · Rodovia, 100">
+        </label>
+        <div class="group-title">Logo</div>
+        <div class="btn-row">
+          <button class="btn sm" id="logoBtn">Enviar outra logo…</button>
+          <button class="btn sm" id="logoDel">Usar a logo da ROMANO</button>
+          <input type="file" id="logoFile" accept="image/*" hidden>
+        </div>
+        <p class="hint">Em Modelo, use “+ Logo da loja” para colocar a logo em qualquer modelo.</p>
+      </div>
+      <div class="group">
+        <p class="group-title">Campos disponíveis nos textos</p>
+        <div class="chips">
+          <span class="chip">{descricao}</span><span class="chip">{unidade}</span><span class="chip">{de}</span><span class="chip">{por}</span>
+          <span class="chip">{economia}</span><span class="chip">{pct}</span><span class="chip">{validade}</span><span class="chip">{extra}</span>
+          <span class="chip">{loja}</span><span class="chip">{contato}</span><span class="chip">{codigo}</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="stage-col" aria-label="Pré-visualização">
+    <div class="stage" id="stage">
+      <div class="paper" id="paper">
+        <canvas id="cv" aria-label="Pré-visualização da placa"></canvas>
+        <div class="sel" id="sel" hidden><span class="h" id="handle"></span></div>
+      </div>
+      <span class="dim" id="dimL"></span>
+      <span class="dim dim-r" id="dimR"></span>
+    </div>
+    <div class="actions">
+      <button class="btn primary" id="btnPng">Baixar PNG</button>
+      <button class="btn" id="btnJpg">Baixar JPG</button>
+      <button class="btn" id="btnPdf">Baixar PDF</button>
+      <button class="btn" id="btnPrint">Imprimir</button>
+      <span class="spacer"></span>
+      <span class="status" id="status"></span>
+    </div>
+  </section>
+</main>
+<p class="foot wrap">Modelos personalizados, logo e lista ficam salvos neste navegador.</p>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div id="printArea"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script type="module" src="/src/cartaz/gerador.js"></script>
+</body>
+</html>

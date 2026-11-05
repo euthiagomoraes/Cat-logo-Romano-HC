@@ -3,3 +3,6 @@ project_id = "catalogo-rhc"
 
 [functions.admin-usuarios]
 verify_jwt = false
+
+[functions.integracao-erp]
+verify_jwt = false

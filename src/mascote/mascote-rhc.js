@@ -1,5 +1,5 @@
 /*!
- * Mascote RHC — entrada animada (anda da esquerda, para e acena)
+ * Mascote ROMANO — entrada animada (anda da esquerda, para e acena)
  * Toca os quadros do vídeo original num <canvas> a partir de 3 folhas de sprites WebP.
  * Funciona igual em Chrome, Edge, Firefox, Safari e iPhone (não depende de <video> nem de autoplay).
  *

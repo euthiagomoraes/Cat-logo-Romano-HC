@@ -1,5 +1,5 @@
 -- =====================================================================
--- Catálogo RHC — estrutura, segurança e funções de gravar/publicar
+-- Catálogo ROMANO — estrutura, segurança e funções de gravar/publicar
 --
 -- Conceito:
 --   * As tabelas loja, servicos, categorias, banners e produtos guardam o

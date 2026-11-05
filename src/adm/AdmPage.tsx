@@ -7,7 +7,7 @@ import { Icon } from '../lib/icons';
 import { Aviso, Campo } from './ui';
 import Editor from './Editor';
 
-type Fase = 'carregando' | 'login' | 'primeiro' | 'esqueci' | 'nova-senha' | 'sem-acesso' | 'editor';
+type Fase = 'carregando' | 'login' | 'primeiro' | 'esqueci' | 'nova-senha' | 'sem-acesso' | 'logistica' | 'editor';
 
 export default function AdmPage() {
   const [fase, setFase] = useState<Fase>('carregando');
@@ -34,6 +34,11 @@ export default function AdmPage() {
     if (!cad || !cad.ativo) {
       setAdmin(null);
       setFase('sem-acesso');
+      return;
+    }
+    if (cad.papel === 'logistica') {
+      setAdmin(null);
+      setFase('logistica');
       return;
     }
     setAdmin(cad);
@@ -99,6 +104,13 @@ export default function AdmPage() {
               <button className="btn" onClick={sair}><Icon name="logout" /> Sair e entrar com outra conta</button>
             </Bloco>
           )}
+          {fase === 'logistica' && (
+            <Bloco titulo="Sua conta é da logística">
+              <p className="hint">A conta <b>{email}</b> acessa o painel de pedidos e entregas, não o editor do catálogo.</p>
+              <a className="btn primary lg" href="/logistica"><Icon name="truck" /> Abrir o painel de logística</a>
+              <button className="btn" onClick={sair}><Icon name="logout" /> Sair</button>
+            </Bloco>
+          )}
           <a className="login-link" href="/home"><Icon name="left" /> Ver o catálogo publicado</a>
         </div>
       </main>
@@ -116,6 +128,15 @@ function Bloco({ titulo, sub, children }: { titulo: string; sub?: string; childr
 }
 
 function Login({ onEsqueci }: { onEsqueci: () => void }) {
+  return (
+    <Bloco titulo="Entrar" sub="Use o e-mail e a senha cadastrados pelo administrador.">
+      <FormLogin onEsqueci={onEsqueci} />
+    </Bloco>
+  );
+}
+
+/** Formulário de e-mail e senha (usado também em /logistica). */
+export function FormLogin({ onEsqueci }: { onEsqueci?: () => void }) {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [erro, setErro] = useState('');
@@ -131,15 +152,13 @@ function Login({ onEsqueci }: { onEsqueci: () => void }) {
   };
 
   return (
-    <Bloco titulo="Entrar" sub="Use o e-mail e a senha cadastrados pelo administrador.">
-      <form className="login-campos" onSubmit={entrar}>
-        <Campo rotulo="E-mail"><input type="email" autoComplete="username" required value={email} onChange={(e) => setEmail(e.target.value)} /></Campo>
-        <Campo rotulo="Senha"><input type="password" autoComplete="current-password" required value={senha} onChange={(e) => setSenha(e.target.value)} /></Campo>
-        {erro && <Aviso tipo="erro">{erro}</Aviso>}
-        <button className="btn primary lg" disabled={enviando}>{enviando ? 'Entrando…' : 'Entrar'}</button>
-        <button type="button" className="btn ghost" onClick={onEsqueci}>Esqueci minha senha</button>
-      </form>
-    </Bloco>
+    <form className="login-campos" onSubmit={entrar}>
+      <Campo rotulo="E-mail"><input type="email" autoComplete="username" required value={email} onChange={(e) => setEmail(e.target.value)} /></Campo>
+      <Campo rotulo="Senha"><input type="password" autoComplete="current-password" required value={senha} onChange={(e) => setSenha(e.target.value)} /></Campo>
+      {erro && <Aviso tipo="erro">{erro}</Aviso>}
+      <button className="btn primary lg" disabled={enviando}>{enviando ? 'Entrando…' : 'Entrar'}</button>
+      {onEsqueci && <button type="button" className="btn ghost" onClick={onEsqueci}>Esqueci minha senha</button>}
+    </form>
   );
 }
 
