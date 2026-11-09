@@ -7,7 +7,7 @@ import type { EventoPedido, ItemPedido, Pedido, Rastreio, StatusPedido } from '.
  * feitas no painel aparecem no rastreio na hora (BroadcastChannel).
  */
 
-const CHAVE = 'romano-logistica-demo-v4';
+const CHAVE = 'romano-logistica-demo-v5';
 const canalNome = 'romano-logistica-demo';
 
 interface Banco { pedidos: Pedido[]; eventos: EventoPedido[]; seq: number; eventoSeq: number }
@@ -65,6 +65,21 @@ function semente(): Banco {
     base(1040, 'Luciana Martins', '91987654321', 'Rua Nova, 77', 'Mutirão',
       [it('FIO-25', 'Cabo flexível 2,5 mm 100 m', 2, 'rl', 219.9)],
       { status: 'entregue', criado_em: min(-300), pago_em: min(-280), separacao_em: min(-240), saiu_em: min(-200), entregue_em: min(-160), motorista: 'José Carlos', veiculo_placa: 'QZA-4F21', atualizado_em: min(-160) }),
+    base(1047, 'Raimundo Ferreira', '91985553322', 'Travessa Pedro Pinheiro, 410', 'São Lourenço',
+      [it('TEL-244', 'Telha fibrocimento 2,44 × 1,10 m 6 mm', 30, 'un', 69.9), it('PAR-110', 'Parafuso para telha 110 mm', 2, 'cx', 38.5)],
+      { status: 'saiu_para_entrega', criado_em: min(-180), pago_em: min(-170), separacao_em: min(-95), saiu_em: min(-25), previsao_entrega: min(20), motorista: 'Antônio Silva', veiculo_placa: 'RTB-7C88', atualizado_em: min(-25) }),
+    base(1048, 'Escola Municipal Santa Rosa', '9137514455', 'Rua Santa Rosa, 1200', 'Santa Rosa',
+      [it('TIN-36', 'Tinta látex PVA branca 3,6 L', 24, 'un', 79.9), it('ROL-23', 'Rolo de lã 23 cm', 12, 'un', 32.5), it('FIT-50', 'Fita crepe 50 mm', 20, 'un', 12.9)],
+      { status: 'em_separacao', forma_pagamento: 'Faturado', observacao: 'Entregar na secretaria, das 8h às 12h.', criado_em: min(-120), pago_em: min(-100), separacao_em: min(-35), atualizado_em: min(-35) }),
+    base(1049, 'Paulo Henrique', '91993334455', 'Rua São João, 210', 'São João',
+      [it('CIM-50', 'Cimento CP II 50 kg', 10, 'sc', 38.9), it('CAL-20', 'Cal hidratada 20 kg', 4, 'sc', 18.5)],
+      { status: 'pago', criado_em: min(-95), pago_em: min(-75), atualizado_em: min(-75) }),
+    base(1050, 'Joana Ribeiro', '91984445566', 'Rua Magno de Araújo, 88', 'Algodoal',
+      [it('LAM-9W', 'Lâmpada LED 9 W', 12, 'un', 9.9), it('TOM-10A', 'Tomada 10 A', 6, 'un', 11.9), it('DIS-32', 'Disjuntor 32 A', 2, 'un', 24.9)],
+      { status: 'entregue', criado_em: min(-360), pago_em: min(-350), separacao_em: min(-320), saiu_em: min(-290), entregue_em: min(-250), motorista: 'Antônio Silva', veiculo_placa: 'RTB-7C88', atualizado_em: min(-250) }),
+    base(1051, 'Ferragens Maratauíra', '9137512020', 'Av. Dom Pedro II, 1500', 'Centro',
+      [it('VER-08', 'Vergalhão CA-50 8 mm 12 m', 60, 'br', 39.9), it('ARA-18', 'Arame recozido 18', 10, 'kg', 21.9)],
+      { status: 'entregue', forma_pagamento: 'Boleto', criado_em: min(-420), pago_em: min(-410), separacao_em: min(-380), saiu_em: min(-330), entregue_em: min(-300), motorista: 'José Carlos', veiculo_placa: 'QZA-4F21', atualizado_em: min(-300) }),
   ];
   const eventos: EventoPedido[] = [];
   let e = 1;
@@ -78,7 +93,7 @@ function semente(): Banco {
       if (quando) eventos.push({ id: e++, pedido_id: p.id, status: s, descricao: doErp ? 'Pedido pago recebido do sistema de gestão.' : DESCRICAO[s], autor_nome: doErp ? 'erp' : 'Equipe ROMANO', origem: doErp ? 'integracao' : 'painel', criado_em: quando });
     }
   }
-  return { pedidos, eventos, seq: 1047, eventoSeq: e };
+  return { pedidos, eventos, seq: 1052, eventoSeq: e };
 }
 
 function ler(): Banco {
@@ -112,26 +127,41 @@ export function reiniciarDemo() {
   gravar(semente());
 }
 
-const VENDAS_EXEMPLO: [string, string, string, string, ItemPedido[], string, string][] = [
+/* Vendas de exemplo feitas no caixa da loja (PDV) com entrega */
+const VENDAS_CAIXA: [string, string, string, string, ItemPedido[], string][] = [
   ['Paulo Henrique', '91993334455', 'Rua São João, 210', 'São João',
-    [it('CIM-50', 'Cimento CP II 50 kg', 10, 'sc', 38.9), it('CAL-20', 'Cal hidratada 20 kg', 4, 'sc', 18.5)], 'Pix', ''],
+    [it('CIM-50', 'Cimento CP II 50 kg', 10, 'sc', 38.9), it('CAL-20', 'Cal hidratada 20 kg', 4, 'sc', 18.5)], 'Pix'],
   ['Joana Ribeiro', '91984445566', 'Rua Santa Rosa, 300, casa 4', 'Santa Rosa',
-    [it('TIN-36', 'Tinta látex PVA 3,6 L', 4, 'un', 79.9), it('LIX-100', 'Lixa d’água 100', 10, 'un', 2.5)], 'Cartão', ''],
+    [it('TIN-36', 'Tinta látex PVA 3,6 L', 4, 'un', 79.9), it('LIX-100', 'Lixa d’água 100', 10, 'un', 2.5)], 'Cartão de débito'],
   ['Mercadinho Bom Preço', '9137511212', 'Av. Dom Pedro II, 540', 'Centro',
-    [it('LAM-9W', 'Lâmpada LED 9 W', 24, 'un', 9.9), it('TOM-10A', 'Tomada 10 A', 12, 'un', 11.9)], 'Dinheiro', 'Venda no balcão (PDV).'],
+    [it('LAM-9W', 'Lâmpada LED 9 W', 24, 'un', 9.9), it('TOM-10A', 'Tomada 10 A', 12, 'un', 11.9)], 'Dinheiro'],
+  ['Francisco das Chagas', '91982227788', 'Travessa Santa Rita, 15', 'Algodoal',
+    [it('ARE-M3', 'Areia média', 3, 'm³', 145), it('BRI-M3', 'Brita 1', 2, 'm³', 160), it('CIM-50', 'Cimento CP II 50 kg', 15, 'sc', 38.9)], 'Cartão de crédito 3x'],
+  ['Igreja Assembleia de Deus', '9137513030', 'Rua da Paz, 400', 'Cristo Redentor',
+    [it('POR-60', 'Porcelanato 60x60 acetinado', 45, 'm²', 69.9), it('ARG-AC3', 'Argamassa AC-III 20 kg', 18, 'sc', 42), it('REJ-01', 'Rejunte flexível 1 kg', 10, 'un', 12.9)], 'Pix'],
+  ['Maria do Socorro', '91987771122', 'Rua Nova, 52', 'Mutirão',
+    [it('CAI-1000', 'Caixa d’água 1000 L', 1, 'un', 449.9), it('TUB-25', 'Tubo PVC soldável 25 mm 6 m', 6, 'br', 18.9)], 'Dinheiro'],
 ];
 
-/** Só na demonstração: imita o ERP enviando uma venda paga (site, vendedor ou PDV do balcão). */
-export function simularPedidoErp() {
+/**
+ * Só na demonstração: imita uma venda paga no caixa da loja (PDV), com entrega,
+ * chegando ao painel pelo sistema de gestão — como vai acontecer de verdade.
+ */
+export function simularVendaCaixa() {
   const b = structuredClone(banco());
   const agora = new Date().toISOString();
   const n = b.seq++;
-  const [cliente, tel, end, bairro, itens, forma, obs] = VENDAS_EXEMPLO[n % VENDAS_EXEMPLO.length];
-  const p = base(n, cliente, tel, end, bairro, itens, { forma_pagamento: forma, observacao: obs, criado_em: agora, pago_em: agora, atualizado_em: agora });
+  const [cliente, tel, end, bairro, itens, forma] = VENDAS_CAIXA[n % VENDAS_CAIXA.length];
+  const caixa = String((n % 3) + 1).padStart(2, '0');
+  const cupom = String(48200 + n * 7).padStart(6, '0');
+  const p = base(n, cliente, tel, end, bairro, itens, {
+    forma_pagamento: forma, observacao: `Venda no caixa ${caixa} (PDV) · cupom ${cupom}`,
+    criado_em: agora, pago_em: agora, atualizado_em: agora,
+  });
   b.pedidos.push(p);
-  b.eventos.push({ id: b.eventoSeq++, pedido_id: p.id, status: 'pago', descricao: 'Pedido pago recebido do sistema de gestão.', autor_nome: 'erp', origem: 'integracao', criado_em: agora });
+  b.eventos.push({ id: b.eventoSeq++, pedido_id: p.id, status: 'pago', descricao: `Venda paga no caixa ${caixa} (PDV), recebida do sistema de gestão.`, autor_nome: 'erp', origem: 'integracao', criado_em: agora });
   gravar(b);
-  return p;
+  return { pedido: p, caixa };
 }
 
 const espera = () => new Promise((r) => setTimeout(r, 180));

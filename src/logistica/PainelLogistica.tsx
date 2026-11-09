@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent, type
 import { Icon } from '../lib/icons';
 import { brl, fmtTelefone, waLink } from '../lib/format';
 import { Aviso, BotaoConfirmar, Campo, copiarTexto } from '../adm/ui';
-import { reiniciarDemo, simularPedidoErp } from './demo';
+import { reiniciarDemo, simularVendaCaixa } from './demo';
 import { diaHora, haQuanto, hora, linkRastreio, progressoRota, type EstadoConexao, type FonteLogistica } from './fonte';
 import { ORIGEM, PROXIMO, STATUS, TRANSICOES, type DadosSaida, type EventoPedido, type Pedido, type StatusPedido } from './tipos';
 
@@ -126,9 +126,12 @@ export default function PainelLogistica({ fonte, usuario, onSair }: {
               </BotaoConfirmar>
             )}
             {fonte.demo && (
-              <button className="btn sun" title="Só na demonstração: imita o ERP enviando uma venda paga"
-                onClick={() => { const p = simularPedidoErp(); setMsg({ tipo: 'ok', texto: `${p.numero} chegou do ERP (simulação).` }); }}>
-                <Icon name="plus" /><span className="some-pequeno">Simular venda no ERP</span>
+              <button className="btn sun" title="Só na demonstração: imita uma venda paga no caixa (PDV) chegando para entrega"
+                onClick={() => {
+                  const { pedido, caixa } = simularVendaCaixa();
+                  setMsg({ tipo: 'ok', texto: `${pedido.numero} · ${pedido.cliente_nome}: venda paga no caixa ${caixa} chegou para separar (simulação).` });
+                }}>
+                <Icon name="cart" /><span className="some-pequeno">Simular venda do caixa</span>
               </button>
             )}
             {usuario && (

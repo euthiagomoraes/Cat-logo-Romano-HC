@@ -164,3 +164,6 @@ button.chip:hover{border-color:var(--select)}
 .lote-resumo{display:flex;flex-wrap:wrap;gap:6px}
 #tab-lote.arrastando{outline:2px dashed var(--select);outline-offset:-8px;border-radius:12px}
 .lote-item .q{font:600 11px var(--f-mono);color:var(--muted);margin-left:6px}
+
+/* Grupo escondido não deixa linha divisória sobrando */
+.group[hidden] + .group{border-top:0;padding-top:0}
