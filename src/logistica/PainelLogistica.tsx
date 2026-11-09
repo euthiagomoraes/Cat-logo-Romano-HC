@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent, type
 import { Icon } from '../lib/icons';
 import { brl, fmtTelefone, waLink } from '../lib/format';
 import { Aviso, BotaoConfirmar, Campo, copiarTexto } from '../adm/ui';
-import { reiniciarDemo, simularVendaCaixa } from './demo';
+import { reiniciarDemo } from './demo';
 import { diaHora, haQuanto, hora, linkRastreio, progressoRota, type EstadoConexao, type FonteLogistica } from './fonte';
 import { ORIGEM, PROXIMO, STATUS, TRANSICOES, type DadosSaida, type EventoPedido, type Pedido, type StatusPedido } from './tipos';
 
@@ -109,6 +109,30 @@ export default function PainelLogistica({ fonte, usuario, onSair }: {
   }, [pedidos]);
 
   const aberto = pedidos?.find((p) => p.id === abertoId) ?? null;
+  const qtdSimulados = (pedidos ?? []).filter((p) => p.simulado).length;
+
+  // Pedido de teste "vindo do caixa": no painel real grava no banco, marcado como simulação
+  const [simulando, setSimulando] = useState(false);
+  const simular = async () => {
+    setSimulando(true); setMsg(null);
+    try {
+      const { pedido, caixa } = await fonte.simularVendaCaixa();
+      setMsg({ tipo: 'ok', texto: `${pedido.numero} · ${pedido.cliente_nome}: venda paga no caixa ${caixa} chegou para separar (simulação).` });
+      await carregar();
+    } catch (e) {
+      setMsg({ tipo: 'erro', texto: (e as Error).message });
+    } finally { setSimulando(false); }
+  };
+  const limparSimulacoes = async () => {
+    try {
+      const n = await fonte.limparSimulacoes();
+      setAbertoId(null);
+      setMsg({ tipo: 'ok', texto: `${n} pedido(s) de simulação apagado(s).` });
+      await carregar();
+    } catch (e) {
+      setMsg({ tipo: 'erro', texto: (e as Error).message });
+    }
+  };
 
   return (
     <div className="logi">
@@ -125,15 +149,15 @@ export default function PainelLogistica({ fonte, usuario, onSair }: {
                 <Icon name="history" /><span className="some-pequeno">Reiniciar demo</span>
               </BotaoConfirmar>
             )}
-            {fonte.demo && (
-              <button className="btn sun" title="Só na demonstração: imita uma venda paga no caixa (PDV) chegando para entrega"
-                onClick={() => {
-                  const { pedido, caixa } = simularVendaCaixa();
-                  setMsg({ tipo: 'ok', texto: `${pedido.numero} · ${pedido.cliente_nome}: venda paga no caixa ${caixa} chegou para separar (simulação).` });
-                }}>
-                <Icon name="cart" /><span className="some-pequeno">Simular venda do caixa</span>
-              </button>
+            {!fonte.demo && qtdSimulados > 0 && (
+              <BotaoConfirmar className="btn ghost claro" pergunta={`Apagar ${qtdSimulados} pedido(s) de simulação?`} sim="Apagar" onConfirmar={limparSimulacoes}>
+                <Icon name="trash" /><span className="some-pequeno">Limpar simulações</span>
+              </BotaoConfirmar>
             )}
+            <button className="btn sun" disabled={simulando} onClick={() => void simular()}
+              title="Cria um pedido de teste, como se fosse uma venda paga no caixa (PDV) com entrega. Não é enviado ao sistema de gestão.">
+              <Icon name="cart" /><span className="some-pequeno">{simulando ? 'Simulando…' : 'Simular venda do caixa'}</span>
+            </button>
             {usuario && (
               <span className="logi-user">
                 <span><b>{usuario.nome}</b><small>{usuario.papel === 'administrador' ? 'Administrador' : 'Logística'}</small></span>
@@ -234,6 +258,7 @@ function CartaoPedido({ p, agora, ocupado, novo, onAbrir, onAvancar }: {
         <span className="cartao-topo">
           <b>{p.numero}</b>
           {p.origem !== 'erp' && <span className={`origem o-${p.origem}`}>{ORIGEM[p.origem]}</span>}
+          {p.simulado && <span className="origem o-simulado" title="Pedido de teste criado pelo botão “Simular venda do caixa”">Simulação</span>}
           <span className={`cartao-tempo${atrasado ? ' alerta' : ''}`} title={diaHora(desde)}>
             {p.status === 'entregue' ? hora(p.entregue_em) : haQuanto(desde, agora)}
           </span>

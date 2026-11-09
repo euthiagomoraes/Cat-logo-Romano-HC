@@ -155,8 +155,8 @@ export function simularVendaCaixa() {
   const caixa = String((n % 3) + 1).padStart(2, '0');
   const cupom = String(48200 + n * 7).padStart(6, '0');
   const p = base(n, cliente, tel, end, bairro, itens, {
-    forma_pagamento: forma, observacao: `Venda no caixa ${caixa} (PDV) · cupom ${cupom}`,
-    criado_em: agora, pago_em: agora, atualizado_em: agora,
+    forma_pagamento: forma, observacao: `SIMULAÇÃO · Venda no caixa ${caixa} (PDV) · cupom ${cupom}`,
+    criado_em: agora, pago_em: agora, atualizado_em: agora, simulado: true,
   });
   b.pedidos.push(p);
   b.eventos.push({ id: b.eventoSeq++, pedido_id: p.id, status: 'pago', descricao: `Venda paga no caixa ${caixa} (PDV), recebida do sistema de gestão.`, autor_nome: 'erp', origem: 'integracao', criado_em: agora });
@@ -202,6 +202,19 @@ export const fonteDemo: FonteLogistica = {
     gravar(b);
   },
 
+  async simularVendaCaixa() {
+    await espera();
+    return simularVendaCaixa();
+  },
+
+  async limparSimulacoes() {
+    const b = structuredClone(banco());
+    const ids = new Set(b.pedidos.filter((p) => p.simulado).map((p) => p.id));
+    b.pedidos = b.pedidos.filter((p) => !ids.has(p.id));
+    b.eventos = b.eventos.filter((e) => !ids.has(e.pedido_id));
+    gravar(b);
+    return ids.size;
+  },
 
   async registrarPosicao(id, lat, lng) {
     const b = structuredClone(banco());

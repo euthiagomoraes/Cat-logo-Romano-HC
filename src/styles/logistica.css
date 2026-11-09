@@ -296,3 +296,7 @@
   .logi-topo-acoes { margin-left: 0; width: 100%; justify-content: space-between; }
   .logi-topo .aovivo { margin-left: auto; }
 }
+
+/* Selo dos pedidos de teste (botão "Simular venda do caixa") */
+.origem.o-simulado { background: #EDE7FF; color: #4B2BB3; border-color: #CFC2FF; }
+@media (prefers-color-scheme: dark) { .origem.o-simulado { background: #2A2150; color: #C9BBFF; border-color: transparent; } }

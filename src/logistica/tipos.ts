@@ -51,6 +51,8 @@ export interface Pedido {
   posicao_em: string | null;
   criado_em: string;
   atualizado_em: string;
+  /** Pedido de teste criado pelo botão "Simular venda do caixa" */
+  simulado?: boolean;
 }
 
 export interface EventoPedido {

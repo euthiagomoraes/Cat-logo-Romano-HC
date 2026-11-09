@@ -14,6 +14,10 @@ export interface FonteLogistica {
   eventos(pedidoId: string): Promise<EventoPedido[]>;
   mudarStatus(id: string, status: StatusPedido, descricao?: string, saida?: DadosSaida): Promise<void>;
   registrarPosicao(id: string, lat: number, lng: number): Promise<void>;
+  /** Cria um pedido de teste como se fosse uma venda paga no caixa (PDV). */
+  simularVendaCaixa(): Promise<{ pedido: Pedido; caixa: string }>;
+  /** Apaga todos os pedidos de teste. Devolve quantos foram apagados. */
+  limparSimulacoes(): Promise<number>;
   /** Avisa quando qualquer pedido muda. Devolve a função para cancelar. */
   assinar(aoMudar: () => void, aoEstado: (e: EstadoConexao) => void): () => void;
   rastreio(codigo: string): Promise<Rastreio | null>;
@@ -26,6 +30,9 @@ function mensagemErro(e: { message?: string; details?: string } | null): string 
   if (m.includes('TRANSICAO_INVALIDA')) return 'Esse pedido já mudou de etapa. A lista foi atualizada; confira e tente de novo.';
   if (m.includes('PEDIDO_NAO_ENCONTRADO')) return 'Pedido não encontrado.';
   if (m.includes('POSICAO_INVALIDA')) return 'Localização inválida.';
+  if (/logistica_(simular_venda_caixa|limpar_simulacoes)/.test(m) && /could not find|does not exist|schema cache/i.test(m)) {
+    return 'A simulação ainda não está instalada no banco. Rode a migração 20261109120000_simulacao_caixa.sql no Supabase (SQL Editor).';
+  }
   if (m.includes('Failed to fetch') || m.includes('NetworkError')) return 'Sem conexão com o servidor. Verifique a internet e tente de novo.';
   return e?.message || 'Erro inesperado. Tente de novo.';
 }
@@ -74,6 +81,19 @@ export const fonteSupabase: FonteLogistica = {
   async registrarPosicao(id, lat, lng) {
     const { error } = await supabase.rpc('logistica_registrar_posicao', { p_pedido: id, p_lat: lat, p_lng: lng });
     if (error) throw new Error(mensagemErro(error));
+  },
+
+  async simularVendaCaixa() {
+    const { data, error } = await supabase.rpc('logistica_simular_venda_caixa');
+    if (error) throw new Error(mensagemErro(error));
+    const r = data as { pedido: Pedido; caixa: string };
+    return { pedido: normalizar(r.pedido), caixa: r.caixa };
+  },
+
+  async limparSimulacoes() {
+    const { data, error } = await supabase.rpc('logistica_limpar_simulacoes');
+    if (error) throw new Error(mensagemErro(error));
+    return Number(data) || 0;
   },
 
   assinar(aoMudar, aoEstado) {
