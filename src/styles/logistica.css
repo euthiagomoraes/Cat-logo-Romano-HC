@@ -105,8 +105,9 @@
 .cena-feito { position: absolute; left: 0; top: 0; height: 5px; background: var(--sun); transition: width 1.2s ease; }
 
 .cena-veiculo { position: absolute; bottom: 22px; width: min(190px, 46%); transform: translateX(-50%); transition: left 1.2s cubic-bezier(.4, 0, .2, 1); z-index: 2; filter: drop-shadow(0 6px 6px rgba(0, 0, 0, .18)); }
-.cena:not(.em-rota):not(.concluida) .cena-veiculo { margin-left: clamp(54px, 13%, 100px); }
-.cena.concluida .cena-veiculo { margin-left: calc(-1 * clamp(58px, 14%, 110px)); }
+/* Parado na loja / entregue: desloca metade da largura do caminhão para ele não sair da cena */
+.cena:not(.em-rota):not(.concluida) .cena-veiculo { margin-left: calc(min(190px, 46%) / 2 + 6px); }
+.cena.concluida .cena-veiculo { margin-left: calc(-1 * (min(190px, 46%) / 2 + 6px)); }
 
 /* =====================================================================
    Página pública de rastreio
@@ -300,3 +301,11 @@
 /* Selo dos pedidos de teste (botão "Simular venda do caixa") */
 .origem.o-simulado { background: #EDE7FF; color: #4B2BB3; border-color: #CFC2FF; }
 @media (prefers-color-scheme: dark) { .origem.o-simulado { background: #2A2150; color: #C9BBFF; border-color: transparent; } }
+
+/* Caminhão com a arte oficial (imagem): fumaça e balanço em escala da imagem */
+.caminhao-arte .carroceria { transform-box: view-box; transform-origin: 50% 100%; }
+.caminhao-arte.andando .carroceria { animation: balanco-arte .45s ease-in-out infinite alternate; }
+.caminhao-arte.andando .fumaca circle { animation-name: fumaca-arte; }
+@keyframes balanco-arte { from { transform: translateY(0); } to { transform: translateY(-5px); } }
+@keyframes fumaca-arte { 0% { transform: translate(0, 0) scale(.4); opacity: .8; } 100% { transform: translate(-60px, -36px) scale(1.4); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .caminhao-arte.andando .carroceria, .caminhao-arte.andando .fumaca circle { animation: none; } }
